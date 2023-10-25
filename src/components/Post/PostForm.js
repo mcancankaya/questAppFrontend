@@ -41,8 +41,8 @@ function PostForm(props) {
             body: JSON.stringify({
                 title:title,
                 userId:userId,
-                text: text,
-            }),
+                text:text
+            })
         })
         .then((res) => res.json())
         .catch((err) => console.log(err));

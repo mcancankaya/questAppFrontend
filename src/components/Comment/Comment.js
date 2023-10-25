@@ -17,9 +17,8 @@ function Comment(props) {
                     <InputAdornment position="start">
                          <Link style={{textDecoration: "none" , boxShadow : "none", color:"white"}} 
                             to={{pathname : '/users/'+ userId}}>
-                            <Avatar 
-                                
-                                sx={{ background:'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)', color:'white' }} 
+                            <Avatar
+                                sx={{ bgcolor:'gray', color:'white' }} 
                                 aria-label="recipe">
                             {userName.charAt(0).toUpperCase()}
                             </Avatar>
