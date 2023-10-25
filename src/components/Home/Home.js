@@ -26,8 +26,9 @@ function Home() {
     };
     
     useEffect(()=>{
-        refreshPosts();
-    },[postList])
+        if(!isLoaded)
+            refreshPosts();
+        },[postList])
     
     if(error){
         return <div>Error !!!</div>
@@ -36,7 +37,8 @@ function Home() {
     }else{
         return (
             <div  style={{display:"flex", flexWrap:"wrap", justifyContent:"center",alignItems:"center", backgroundColor:"#f0f5ff"}}>
-                <PostForm userId = {1} userName = {"mahmut"} refreshPosts = {refreshPosts} />
+                {localStorage.getItem("currentUser") == null?"":<PostForm userId = {localStorage.getItem("currentUser")} userName = {"1"} refreshPosts = {refreshPosts} />}
+                
                     {postList.map( post => (
                         <Post likes={post.postLikes} postId ={post.id} userId = {post.userId} userName = {post.userName} title={post.title} text = {post.text} ></Post>  
                     ))}
