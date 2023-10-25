@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { styled } from '@mui/material/styles';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
@@ -8,9 +8,11 @@ import Collapse from '@mui/material/Collapse';
 import Avatar from '@mui/material/Avatar';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import { red } from '@mui/material/colors';
 import FavoriteIcon from '@mui/icons-material/Favorite';
 import CommentIcon from '@mui/icons-material/Comment';
+import { Link } from "react-router-dom";
+import Container from '@mui/material/Container/Container'
+import Comment from "../Comment/Comment";
 
 const ExpandMore = styled((params) => {
   const { expand, ...other } = params;
@@ -24,22 +26,58 @@ const ExpandMore = styled((params) => {
 }));
 
 function Post(props) {
-    const {title, text} = props;
+    const {postId, title, text, userId, userName} = props;
     const [expanded, setExpanded] = useState(false);
+    const [liked, setLiked] = useState(false);
+    const [error, setError] = useState(null);
+    const [isLoaded, setIsLoaded] = useState(false);
+    const [commentList, setCommentList] = useState([]);
+    const isInitialMount = useRef(true);
 
-  const handleExpandClick = () => {
-    setExpanded(!expanded);
+
+    const handleExpandClick = () => {
+      setExpanded(!expanded);
+      refreshComments();
+      console.log(commentList);
+    };
+
+  const handleLike = () => {
+      setLiked(!liked);
+
   };
+  const refreshComments = () =>{
+    fetch("/comments?postId="+postId)
+    .then(res=> res.json())
+    .then(
+        (result) => {
+            setIsLoaded(true);
+            setCommentList(result);
+        },
+        (error) =>{
+            console.log(error);
+            setIsLoaded(true);
+            setError(error);
+        }
+    )};
+
+    useEffect(()=>{
+      if(isInitialMount.current)
+        isInitialMount.current = false;
+      else
+        refreshComments()
+    },[commentList]);
 
   return (
-<Card sx={{ width:900, textAlign:"left"}}>
+  <Card sx={{ width:1000, textAlign:"left", margin:2}}>
       <CardHeader
         
 
         avatar={
-          <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
-            R
+          <Link style={{textDecoration: "none" , boxShadow : "none", color:"white"}} to={{pathname : '/users/'+ userId}}>
+          <Avatar sx={{ background:'linear-gradient(45deg, #2196F3 30%, #21CBF3 90%)', color:'white' }} aria-label="recipe">
+            {userName.charAt(0).toUpperCase()}
           </Avatar>
+          </Link>
         }
       
         title={title}
@@ -52,8 +90,10 @@ function Post(props) {
         </Typography>
       </CardContent>
       <CardActions disableSpacing>
-        <IconButton aria-label="add to favorites">
-          <FavoriteIcon />
+        <IconButton 
+          onClick={handleLike}
+          aria-label="add to favorites">
+          <FavoriteIcon style={liked?{color:"red"}:null} />
         </IconButton>
         <ExpandMore
           expand={expanded}
@@ -65,33 +105,14 @@ function Post(props) {
         </ExpandMore>
       </CardActions>
       <Collapse in={expanded} timeout="auto" unmountOnExit>
-        <CardContent>
-          <Typography paragraph>Method:</Typography>
-          <Typography paragraph>
-            Heat 1/2 cup of the broth in a pot until simmering, add saffron and set
-            aside for 10 minutes.
-          </Typography>
-          <Typography paragraph>
-            Heat oil in a (14- to 16-inch) paella pan or a large, deep skillet over
-            medium-high heat. Add chicken, shrimp and chorizo, and cook, stirring
-            occasionally until lightly browned, 6 to 8 minutes. Transfer shrimp to a
-            large plate and set aside, leaving chicken and chorizo in the pan. Add
-            pimentón, bay leaves, garlic, tomatoes, onion, salt and pepper, and cook,
-            stirring often until thickened and fragrant, about 10 minutes. Add
-            saffron broth and remaining 4 1/2 cups chicken broth; bring to a boil.
-          </Typography>
-          <Typography paragraph>
-            Add rice and stir very gently to distribute. Top with artichokes and
-            peppers, and cook without stirring, until most of the liquid is absorbed,
-            15 to 18 minutes. Reduce heat to medium-low, add reserved shrimp and
-            mussels, tucking them down into the rice, and cook again without
-            stirring, until mussels have opened and rice is just tender, 5 to 7
-            minutes more. (Discard any mussels that don&apos;t open.)
-          </Typography>
-          <Typography>
-            Set aside off of the heat to let rest for 10 minutes, and then serve.
-          </Typography>
-        </CardContent>
+        <Container fixed > 
+          {
+            error?"error":
+            isLoaded?commentList.map(comment => (
+              <Comment userId ={1} userName= {"USER"} text={comment.text}></Comment>
+            )):"Loading"
+          }
+        </Container>
       </Collapse>
     </Card>
 

@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
 import Post from "../Post/Post";
-import Container from '@mui/material/Container';
+import PostForm from "../Post/PostForm";
 
 
 function Home() {
     const [error, setError] = useState(null);
     const [isLoaded, setIsLoaded] = useState(false);
     const [postList, setPostList] = useState([]);
-    
-    useEffect(()=>{
+
+
+    const refreshPosts = () =>{
         fetch("/posts")
         .then(res=> res.json())
         .then(
@@ -22,7 +23,11 @@ function Home() {
                 setError(error);
             }
         )
-    },[])
+    };
+    
+    useEffect(()=>{
+        refreshPosts();
+    },[postList])
     
     if(error){
         return <div>Error !!!</div>
@@ -30,12 +35,13 @@ function Home() {
         return <div> Loading ...</div>
     }else{
         return (
-            <Container fixed  sx={{display:"flex", flexWrap:"wrap", justifyContent:"center",alignItems:"center", backgroundColor:"#cfe8fc",height:'100vh'}}>
+            <div  style={{display:"flex", flexWrap:"wrap", justifyContent:"center",alignItems:"center", backgroundColor:"#f0f5ff"}}>
+                <PostForm userId = {1} userName = {"mahmut"} refreshPosts = {refreshPosts} />
                     {postList.map( post => (
-                        <Post title={post.title} text = {post.text}></Post>  
+                        <Post postId ={post.id} userId = {post.userId} userName = {post.userName} title={post.title} text = {post.text} ></Post>  
                     ))}
                 
-                </Container>
+                </div>
             
         )
     }
