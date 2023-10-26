@@ -26,19 +26,23 @@ function Auth() {
     setPassword(value)
   }
 
-  const sendRequest = (path) => {
-    PostWithoutAuth("/auth/" + path, {
-      userName: username,
-      password: password,
-    })
-      .then((res) => res.json())
-      .then((result) => {
-        localStorage.setItem("tokenKey", result.message);
-        localStorage.setItem("currentUser", result.userId);
-        localStorage.setItem("username", username)
-      })
-      .catch((err) => console.log(err))
-  }
+    const sendRequest= (path)=>{
+        fetch("/auth/"+path, {
+            method:"POST",
+            headers: {
+                "Content-Type":"application/json",
+            },
+            body: JSON.stringify({
+                userName: username,
+                password:password,
+            }),
+        })
+        .then((res) => res.json())
+        .then((result) => {localStorage.setItem("tokenKey",result.message);
+            localStorage.setItem("currentUser",result.userId);
+            localStorage.setItem("username",username)})
+        .catch((err) => console.log(err))
+    }
 
 
   const handleButton = (path) => {
