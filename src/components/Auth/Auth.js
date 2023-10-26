@@ -4,12 +4,11 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
 import Typography from '@mui/material/Typography';
 import { FormControl } from "@mui/material";
-import Grid from '@mui/material/Grid';
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { PostWithAuth } from "../../services/HttpService";
 
 
 function Auth() {
@@ -28,16 +27,10 @@ function Auth() {
     }
 
     const sendRequest= (path)=>{
-        fetch("/auth/"+path, {
-            method:"POST",
-            headers: {
-                "Content-Type":"application/json",
-            },
-            body: JSON.stringify({
-                userName: username,
-                password:password,
-            }),
-        })
+      PostWithAuth("/auth/"+path,{
+        userName: username,
+        password:password,
+    } )
         .then((res) => res.json())
         .then((result) => {localStorage.setItem("tokenKey",result.message);
             localStorage.setItem("currentUser",result.userId);
